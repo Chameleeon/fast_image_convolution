@@ -1,6 +1,6 @@
 workspace "Convolutor"
 architecture "x64"
-startproject "Main"
+startproject "main"
 
 configurations {
   "Debug",
@@ -9,8 +9,8 @@ configurations {
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-project "ConvLib"
-location "ConvLib"
+project "conv_lib"
+location "conv_lib"
 kind "SharedLib"
 language "C++"
 
@@ -31,15 +31,19 @@ staticruntime "On"
 systemversion "latest"
 
 prebuildcommands {
-  ("{MKDIR} ../bin/" .. outputdir .. "/Main")
+  ("{MKDIR} ../bin/" .. outputdir .. "/main")
 }
 
 postbuildcommands {
-  ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Main")
+  ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/main")
 }
 
-project "Main"
-location "Main"
+filter "system:linux or system:macosx"
+        buildoptions { "-fopenmp" }
+        linkoptions { "-fopenmp" }
+
+project "main"
+location "main"
 kind "ConsoleApp"
 language "C++"
 
@@ -52,12 +56,12 @@ files {
 }
 
 includedirs {
-  "ConvLib/src",
+  "conv_lib/src",
   "%{prj.name}/src"
 }
 
 links {
-  "ConvLib"
+  "conv_lib"
 }
 
 cppdialect "C++20"

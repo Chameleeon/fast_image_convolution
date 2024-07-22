@@ -9,38 +9,38 @@ ifndef verbose
 endif
 
 ifeq ($(config),debug)
-  ConvLib_config = debug
-  Main_config = debug
+  conv_lib_config = debug
+  main_config = debug
 
 else ifeq ($(config),release)
-  ConvLib_config = release
-  Main_config = release
+  conv_lib_config = release
+  main_config = release
 
 else
   $(error "invalid configuration $(config)")
 endif
 
-PROJECTS := ConvLib Main
+PROJECTS := conv_lib main
 
 .PHONY: all clean help $(PROJECTS) 
 
 all: $(PROJECTS)
 
-ConvLib:
-ifneq (,$(ConvLib_config))
-	@echo "==== Building ConvLib ($(ConvLib_config)) ===="
-	@${MAKE} --no-print-directory -C ConvLib -f Makefile config=$(ConvLib_config)
+conv_lib:
+ifneq (,$(conv_lib_config))
+	@echo "==== Building conv_lib ($(conv_lib_config)) ===="
+	@${MAKE} --no-print-directory -C conv_lib -f Makefile config=$(conv_lib_config)
 endif
 
-Main: ConvLib
-ifneq (,$(Main_config))
-	@echo "==== Building Main ($(Main_config)) ===="
-	@${MAKE} --no-print-directory -C Main -f Makefile config=$(Main_config)
+main: conv_lib
+ifneq (,$(main_config))
+	@echo "==== Building main ($(main_config)) ===="
+	@${MAKE} --no-print-directory -C main -f Makefile config=$(main_config)
 endif
 
 clean:
-	@${MAKE} --no-print-directory -C ConvLib -f Makefile clean
-	@${MAKE} --no-print-directory -C Main -f Makefile clean
+	@${MAKE} --no-print-directory -C conv_lib -f Makefile clean
+	@${MAKE} --no-print-directory -C main -f Makefile clean
 
 help:
 	@echo "Usage: make [config=name] [target]"
@@ -52,7 +52,7 @@ help:
 	@echo "TARGETS:"
 	@echo "   all (default)"
 	@echo "   clean"
-	@echo "   ConvLib"
-	@echo "   Main"
+	@echo "   conv_lib"
+	@echo "   main"
 	@echo ""
 	@echo "For more information, see https://github.com/premake/premake-core/wiki"
