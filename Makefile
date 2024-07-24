@@ -16,6 +16,14 @@ else ifeq ($(config),release)
   conv_lib_config = release
   main_config = release
 
+else ifeq ($(config),releasesimd)
+  conv_lib_config = releasesimd
+  main_config = releasesimd
+
+else ifeq ($(config),releasecsimd)
+  conv_lib_config = releasecsimd
+  main_config = releasecsimd
+
 else
   $(error "invalid configuration $(config)")
 endif
@@ -48,6 +56,8 @@ help:
 	@echo "CONFIGURATIONS:"
 	@echo "  debug"
 	@echo "  release"
+	@echo "  releasesimd"
+	@echo "  releasecsimd"
 	@echo ""
 	@echo "TARGETS:"
 	@echo "   all (default)"

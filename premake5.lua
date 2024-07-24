@@ -1,69 +1,116 @@
 workspace "Convolutor"
-architecture "x64"
-startproject "main"
+    architecture "x64"
+    startproject "main"
 
-configurations {
-  "Debug",
-  "Release"
-}
+    configurations {
+        "Debug",
+        "Release",
+        "ReleaseSIMD",
+        "ReleaseCSIMD"
+    }
 
-outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
-
-project "conv_lib"
-location "conv_lib"
-kind "SharedLib"
-language "C++"
-
-targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-objdir ("obj/" .. outputdir .. "/%{prj.name}")
-
-files {
-  "%{prj.name}/src/**.h",
-  "%{prj.name}/src/**.cpp"
-}
-
-includedirs {
-  "%{prj.name}/src"
-}
-
-cppdialect "C++20"
-staticruntime "On"
-systemversion "latest"
-
-prebuildcommands {
-  ("{MKDIR} ../bin/" .. outputdir .. "/main")
-}
-
-postbuildcommands {
-  ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/main")
-}
-
-filter "system:linux or system:macosx"
-        buildoptions { "-fopenmp" }
+    filter "configurations:ReleaseCSIMD"
+        defines { "NDEBUG", "CSIMD" }
+        buildoptions { "-fopenmp", "-mavx2", "-O3" }
         linkoptions { "-fopenmp" }
 
-project "main"
-location "main"
-kind "ConsoleApp"
-language "C++"
+    filter "configurations:ReleaseSIMD"
+        defines { "NDEBUG", "SIMD" }
+        buildoptions { "-fopenmp", "-mavx2", "-O3" }
+        linkoptions { "-fopenmp" }
 
-targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-objdir ("obj/" .. outputdir .. "/%{prj.name}")
+    outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-files {
-  "%{prj.name}/src/**.h",
-  "%{prj.name}/src/**.cpp"
-}
+    project "conv_lib"
+        location "conv_lib"
+        kind "SharedLib"
+        language "C++"
 
-includedirs {
-  "conv_lib/src",
-  "%{prj.name}/src"
-}
+        targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+        objdir ("obj/" .. outputdir .. "/%{prj.name}")
 
-links {
-  "conv_lib"
-}
+        files {
+            "%{prj.name}/src/**.h",
+            "%{prj.name}/src/**.cpp"
+        }
 
-cppdialect "C++20"
-staticruntime "On"
-systemversion "latest"
+        includedirs {
+            "%{prj.name}/src"
+        }
+
+        cppdialect "C++20"
+        staticruntime "On"
+        systemversion "latest"
+
+        prebuildcommands {
+            ("{MKDIR} ../bin/" .. outputdir .. "/main")
+        }
+
+        postbuildcommands {
+            ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/main")
+        }
+
+        -- Apply conditional compiler definitions
+        filter "configurations:Debug"
+            defines { "DEBUG", "LOGGING" }
+            symbols "On"
+
+        filter "configurations:Release"
+            defines { "NDEBUG" }
+            buildoptions { "-fopenmp", "-O2" }
+            linkoptions { "-fopenmp" }
+
+        filter "configurations:ReleaseSIMD"
+            defines { "NDEBUG", "SIMD" }
+            buildoptions { "-fopenmp", "-mavx2", "-O3" }
+            linkoptions { "-fopenmp" }
+        filter "configurations:ReleaseSIMD"
+            defines { "NDEBUG", "CSIMD" }
+            buildoptions { "-fopenmp", "-mavx2" }
+            linkoptions { "-fopenmp" }
+
+    project "main"
+        location "main"
+        kind "ConsoleApp"
+        language "C++"
+
+        targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+        objdir ("obj/" .. outputdir .. "/%{prj.name}")
+
+        files {
+            "%{prj.name}/src/**.h",
+            "%{prj.name}/src/**.cpp"
+        }
+
+        includedirs {
+            "conv_lib/src",
+            "%{prj.name}/src"
+        }
+
+        links {
+            "conv_lib"
+        }
+
+        cppdialect "C++20"
+        staticruntime "On"
+        systemversion "latest"
+
+        -- Apply conditional compiler definitions
+        filter "configurations:Debug"
+            defines { "DEBUG", "LOGGING" }
+            symbols "On"
+
+        filter "configurations:Release"
+            defines { "NDEBUG" }
+            buildoptions { "-fopenmp" }
+            linkoptions { "-fopenmp" }
+
+        filter "configurations:ReleaseSIMD"
+            defines { "NDEBUG", "SIMD" }
+            buildoptions { "-fopenmp", "-mavx2", "-O3" }
+            linkoptions { "-fopenmp" }
+
+        filter "configurations:ReleaseCSIMD"
+            defines { "NDEBUG", "CSIMD" }
+            buildoptions { "-fopenmp", "-mavx2" }
+            linkoptions { "-fopenmp" }

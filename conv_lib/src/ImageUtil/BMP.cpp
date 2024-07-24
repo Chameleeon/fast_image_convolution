@@ -47,5 +47,4 @@ void BMP::writeBMP(const std::string &filename) {
   }
 
   file.close();
-  std::cout << "Written to file: " << filename << std::endl;
 }
