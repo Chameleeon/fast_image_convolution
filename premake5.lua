@@ -19,6 +19,11 @@ workspace "Convolutor"
         buildoptions { "-fopenmp", "-mavx2", "-O3" }
         linkoptions { "-fopenmp" }
 
+    filter "configurations:Release"
+        defines { "NDEBUG", "NOSIMD" }
+        buildoptions { "-fopenmp"}
+        linkoptions { "-fopenmp" }
+
     outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
     project "conv_lib"
@@ -56,7 +61,7 @@ workspace "Convolutor"
             symbols "On"
 
         filter "configurations:Release"
-            defines { "NDEBUG" }
+            defines { "NDEBUG", NOSIMD }
             buildoptions { "-fopenmp", "-O2" }
             linkoptions { "-fopenmp" }
 
@@ -64,7 +69,7 @@ workspace "Convolutor"
             defines { "NDEBUG", "SIMD" }
             buildoptions { "-fopenmp", "-mavx2", "-O3" }
             linkoptions { "-fopenmp" }
-        filter "configurations:ReleaseSIMD"
+        filter "configurations:ReleaseCSIMD"
             defines { "NDEBUG", "CSIMD" }
             buildoptions { "-fopenmp", "-mavx2" }
             linkoptions { "-fopenmp" }
@@ -101,7 +106,7 @@ workspace "Convolutor"
             symbols "On"
 
         filter "configurations:Release"
-            defines { "NDEBUG" }
+            defines { "NDEBUG", "NOSIMD" }
             buildoptions { "-fopenmp" }
             linkoptions { "-fopenmp" }
 

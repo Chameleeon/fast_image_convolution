@@ -1,5 +1,6 @@
 #include "Convolution.h"
 #include <algorithm>
+#include <filesystem>
 #include <immintrin.h>
 #include <omp.h>
 
@@ -24,6 +25,7 @@ void set_pixel_value(BMP &output, int width, int x, int y, int channel,
   output.data[byteIndex] = byteValue;
 }
 
+#if defined(NOSIMD) || defined(SIMD)
 void apply_convolution(const std::string &filename, int k_width, int k_height,
                        std::vector<double> kernel, bool use_parallel) {
   BMP image(filename);
@@ -54,10 +56,12 @@ void apply_convolution(const std::string &filename, int k_width, int k_height,
     }
   }
 
-  output.filename = filename + "_output.bmp";
-  output.writeBMP(filename + "_output.bmp");
+  std::filesystem::path path = filename;
+  output.filename = path.stem().string() + "_output.bmp";
+  output.writeBMP("output/" + output.filename);
 }
 
+#endif
 #ifdef CSIMD
 void simd_convolution(const std::string &filename, int k_width, int k_height,
                       std::vector<double> kernel, bool use_parallel) {
@@ -108,7 +112,8 @@ void simd_convolution(const std::string &filename, int k_width, int k_height,
     }
   }
 
-  output.filename = "test_output.bmp";
-  output.writeBMP("test_output.bmp");
+  std::filesystem::path path = filename;
+  output.filename = path.stem().string() + "_output.bmp";
+  output.writeBMP("output/" + output.filename);
 }
 #endif

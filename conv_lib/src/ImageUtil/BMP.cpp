@@ -13,8 +13,14 @@ void BMP::readBMP() {
   file.read(reinterpret_cast<char *>(&infoHeader), sizeof(BMPInfoHeader));
 
   int width = infoHeader.width;
-  int height = infoHeader.height;
+  int height = std::abs(infoHeader.height); // Handle negative height
   int bitCount = infoHeader.bitCount;
+
+  if (bitCount % 8 != 0) {
+    std::cerr << "Unsupported bit count: " << bitCount << std::endl;
+    return;
+  }
+
   int rowSize =
       ((bitCount * width + 31) / 32) * 4; // Calculate row size with padding
   data.resize(rowSize * height);
@@ -37,7 +43,7 @@ void BMP::writeBMP(const std::string &filename) {
   file.write(reinterpret_cast<char *>(&infoHeader), sizeof(BMPInfoHeader));
 
   int width = infoHeader.width;
-  int height = infoHeader.height;
+  int height = std::abs(infoHeader.height); // Handle negative height
   int bitCount = infoHeader.bitCount;
   int rowSize =
       ((bitCount * width + 31) / 32) * 4; // Calculate row size with padding
@@ -47,4 +53,11 @@ void BMP::writeBMP(const std::string &filename) {
   }
 
   file.close();
+}
+
+int main() {
+  BMP bmp("test.bmp");
+  bmp.readBMP();
+  bmp.writeBMP("output.bmp");
+  return 0;
 }
